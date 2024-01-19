@@ -7,7 +7,6 @@ pygame.init()
 
 pygame.display.set_caption('Breakout')
 
-
 # function for outputting text onto the screen
 def draw_text(text, font, text_col, x, y):
     img = font.render(text, True, text_col)
@@ -60,8 +59,6 @@ class wall():
                 pygame.draw.rect(screen, block_col, block[0])
                 pygame.draw.rect(screen, bg, (block[0]), 2)
 
-
-# paddle class
 
 # ball class
 class game_ball():
@@ -174,7 +171,7 @@ while run:
 
     # draw all objects
     wall.draw_wall()
-    player_paddle.draw()
+    player_paddle.draw(screen)
     ball.draw()
 
     if live_ball:
