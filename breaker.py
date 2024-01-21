@@ -11,11 +11,26 @@ pygame.display.set_caption('Breakout')
 intro_sound = pygame.mixer.Sound('sounds/intro_sound.wav')
 main_theme_music = pygame.mixer.Sound('sounds/intro.wav')
 
+score = 0
+
+
 # function for outputting text onto the screen
 def draw_text(text, font, text_col, x, y):
     img = font.render(text, True, text_col)
     screen.blit(img, (x, y))
 
+def draw_text_with_outline(text, font, text_col, x, y, outline_col):
+    text_surface = font.render(text, True, text_col)
+    outline_surface = font.render(text, True, outline_col)
+
+    # Draw the outline by offsetting the position slightly
+    screen.blit(outline_surface, (x-1, y-1))
+    screen.blit(outline_surface, (x+1, y-1))
+    screen.blit(outline_surface, (x-1, y+1))
+    screen.blit(outline_surface, (x+1, y+1))
+
+    # Draw the main text
+    screen.blit(text_surface, (x, y))
 
 # brick wall class
 class wall():
@@ -82,6 +97,9 @@ class game_ball():
             for item in row:
                 # check collision
                 if self.rect.colliderect(item[0]):
+                    # Score update
+                    global score
+                    score += 1
                     # check if collision was from above
                     if abs(self.rect.bottom - item[0].top) < collision_thresh and self.speed_y > 0:
                         self.speed_y *= -1
@@ -167,11 +185,14 @@ def main_game():
 
         screen.fill(bg)
 
+        # Display score
+
         # draw all objects
         wall.draw_wall()
         player_paddle.draw(screen)
         ball.draw()
         main_theme_music.play()
+        draw_text_with_outline(f'Score: {score}', font, score_text_color, screen_width -140, 10, outline_color)
 
         if live_ball:
             # draw paddle

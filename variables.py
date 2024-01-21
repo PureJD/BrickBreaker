@@ -24,6 +24,10 @@ paddle_outline = (100, 100, 100)
 # text colour
 text_col = (78, 81, 139)
 
+# Use a contrasting color for the text
+score_text_color = (255, 255, 0)  # Bright yellow
+outline_color = (0, 0, 0)  # Black outline
+
 # define game variables
 cols = 6
 rows = 6
