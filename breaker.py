@@ -4,8 +4,12 @@ from pygame.locals import *
 from paddle import *
 
 pygame.init()
-
+pygame.mixer.init()
 pygame.display.set_caption('Breakout')
+
+# For loading sound files:
+intro_sound = pygame.mixer.Sound('sounds/intro_sound.wav')
+main_theme_music = pygame.mixer.Sound('sounds/intro.wav')
 
 # function for outputting text onto the screen
 def draw_text(text, font, text_col, x, y):
@@ -152,55 +156,64 @@ class game_ball():
         self.game_over = 0
 
 
-# create a wall
+
+def main_game():
+    run = True
+    while run:
+        global live_ball
+        global game_over
+        
+        clock.tick(fps)
+
+        screen.fill(bg)
+
+        # draw all objects
+        wall.draw_wall()
+        player_paddle.draw(screen)
+        ball.draw()
+        main_theme_music.play()
+
+        if live_ball:
+            # draw paddle
+            player_paddle.move()
+            # draw ball
+            game_over = ball.move()
+            if game_over != 0:
+                live_ball = False
+
+        # print player instructions
+        if not live_ball:
+            if game_over == 0:
+                draw_text('CLICK ANYWHERE TO START', font, text_col, 100, screen_height // 2 + 100)
+            elif game_over == 1:
+                draw_text('YOU WON!', font, text_col, 240, screen_height // 2 + 50)
+                draw_text('CLICK ANYWHERE TO START', font, text_col, 100, screen_height // 2 + 100)
+            elif game_over == -1:
+                draw_text('YOU LOST!', font, text_col, 240, screen_height // 2 + 50)
+                draw_text('CLICK ANYWHERE TO START', font, text_col, 100, screen_height // 2 + 100)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            if event.type == pygame.MOUSEBUTTONDOWN and live_ball == False:
+                live_ball = True
+                ball.reset(player_paddle.x + (player_paddle.width // 2), player_paddle.y - player_paddle.height)
+                player_paddle.reset()
+                wall.create_wall()
+
+        pygame.display.update()
+
+    pygame.quit()
+def show_intro():
+    intro_image = pygame.image.load("images/intro.jpg")
+    screen.blit(intro_image, (0, 0))
+    pygame.display.flip()
+    intro_sound.play()
+    pygame.time.delay(3000)  # Display intro for 3 seconds
+
+# The main game loop has been added into a function. This is to make it easier to add sections like menus and levels and intros.    
+player_paddle = paddle()
+ball = game_ball(player_paddle.x + (player_paddle.width // 2), player_paddle.y - player_paddle.height)
 wall = wall()
 wall.create_wall()
-
-# create paddle
-player_paddle = paddle()
-
-# create ball
-ball = game_ball(player_paddle.x + (player_paddle.width // 2), player_paddle.y - player_paddle.height)
-
-run = True
-while run:
-
-    clock.tick(fps)
-
-    screen.fill(bg)
-
-    # draw all objects
-    wall.draw_wall()
-    player_paddle.draw(screen)
-    ball.draw()
-
-    if live_ball:
-        # draw paddle
-        player_paddle.move()
-        # draw ball
-        game_over = ball.move()
-        if game_over != 0:
-            live_ball = False
-
-    # print player instructions
-    if not live_ball:
-        if game_over == 0:
-            draw_text('CLICK ANYWHERE TO START', font, text_col, 100, screen_height // 2 + 100)
-        elif game_over == 1:
-            draw_text('YOU WON!', font, text_col, 240, screen_height // 2 + 50)
-            draw_text('CLICK ANYWHERE TO START', font, text_col, 100, screen_height // 2 + 100)
-        elif game_over == -1:
-            draw_text('YOU LOST!', font, text_col, 240, screen_height // 2 + 50)
-            draw_text('CLICK ANYWHERE TO START', font, text_col, 100, screen_height // 2 + 100)
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
-        if event.type == pygame.MOUSEBUTTONDOWN and live_ball == False:
-            live_ball = True
-            ball.reset(player_paddle.x + (player_paddle.width // 2), player_paddle.y - player_paddle.height)
-            player_paddle.reset()
-            wall.create_wall()
-
-    pygame.display.update()
-
-pygame.quit()
+show_intro()
+main_game()
