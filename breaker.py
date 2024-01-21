@@ -11,6 +11,7 @@ pygame.display.set_caption('Breakout')
 intro_sound = pygame.mixer.Sound('sounds/intro_sound.wav')
 main_theme_music = pygame.mixer.Sound('sounds/intro.wav')
 
+
 score = 0
 
 
@@ -191,7 +192,14 @@ def main_game():
         wall.draw_wall()
         player_paddle.draw(screen)
         ball.draw()
+        
+        
+
+        # Music 
         main_theme_music.play()
+        main_theme_music.set_volume(0.1)
+
+
         draw_text_with_outline(f'Score: {score}', font, score_text_color, screen_width -140, 10, outline_color)
 
         if live_ball:
@@ -205,29 +213,35 @@ def main_game():
         # print player instructions
         if not live_ball:
             if game_over == 0:
-                draw_text('CLICK ANYWHERE TO START', font, text_col, 100, screen_height // 2 + 100)
+                draw_text('PRESS ANY KEY TO START', font, score_text_color, 310, screen_height // 2 + 100)
             elif game_over == 1:
-                draw_text('YOU WON!', font, text_col, 240, screen_height // 2 + 50)
-                draw_text('CLICK ANYWHERE TO START', font, text_col, 100, screen_height // 2 + 100)
+                draw_text('YOU WON!', font, score_text_color, 280, screen_height // 2 + 50)
+                draw_text('CLICK ANYWHERE TO START', font, score_text_color, 280, screen_height // 2 + 100)
             elif game_over == -1:
-                draw_text('YOU LOST!', font, text_col, 240, screen_height // 2 + 50)
-                draw_text('CLICK ANYWHERE TO START', font, text_col, 100, screen_height // 2 + 100)
+                draw_text('YOU LOST!', font, score_text_color, 280, screen_height // 2 + 50)
+                draw_text('CLICK ANYWHERE TO START', font, score_text_color, 280, screen_height // 2 + 100)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-            if event.type == pygame.MOUSEBUTTONDOWN and live_ball == False:
+            if event.type == pygame.KEYDOWN and live_ball == False:
                 score = 0
                 live_ball = True
                 ball.reset(player_paddle.x + (player_paddle.width // 2), player_paddle.y - player_paddle.height)
                 player_paddle.reset()
                 wall.create_wall()
+       
+
+        
 
         pygame.display.update()
 
     pygame.quit()
+
+
 def show_intro():
     intro_image = pygame.image.load("images/intro.jpg")
-    screen.blit(intro_image, (0, 0))
+    transformed_intro_image = pygame.transform.scale(intro_image, (1000, 1000))
+    screen.blit(transformed_intro_image, (0, 0))
     pygame.display.flip()
     intro_sound.play()
     pygame.time.delay(3000)  # Display intro for 3 seconds
@@ -239,3 +253,4 @@ wall = wall()
 wall.create_wall()
 show_intro()
 main_game()
+
