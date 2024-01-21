@@ -226,7 +226,7 @@ def main_game():
 
             # display instructions
             if game_over == 0:
-                draw_text('PRESS ANY KEY TO START', font, score_text_color, 310, screen_height // 2 + 100)
+                draw_text('PRESS SPACE BAR TO START', font, score_text_color, 310, screen_height // 2 + 100)
             elif game_over == 1:
                 draw_text('YOU WON!', font, score_text_color, 280, screen_height // 2 + 50)
                 draw_text('CLICK ANYWHERE TO START', font, score_text_color, 280, screen_height // 2 + 100)
@@ -236,13 +236,14 @@ def main_game():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-            if event.type == pygame.KEYDOWN and not live_ball:
-                if lives == 0:  # Only reset score and lives if the game was over
-                    score = 0
-                    lives = 3
-                    wall.create_wall()
-                ball.reset(player_paddle.x + (player_paddle.width // 2), player_paddle.y - player_paddle.height + 10)
-                live_ball = True
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE and not live_ball:
+                    if lives == 0:  # Only reset score and lives if the game was over
+                        score = 0
+                        lives = 3
+                        wall.create_wall()
+                    ball.reset(player_paddle.x + (player_paddle.width // 2), player_paddle.y - player_paddle.height)
+                    live_ball = True
 
 
 
