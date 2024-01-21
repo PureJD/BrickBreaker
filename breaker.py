@@ -11,8 +11,8 @@ pygame.display.set_caption('Breakout')
 intro_sound = pygame.mixer.Sound('sounds/intro_sound.wav')
 main_theme_music = pygame.mixer.Sound('sounds/intro.wav')
 
-
 score = 0
+lives = 3
 
 
 # function for outputting text onto the screen
@@ -83,9 +83,11 @@ class wall():
 # ball class
 class game_ball():
     def __init__(self, x, y):
+        self.game_over = None
         self.reset(x, y)
 
     def move(self):
+        global lives
 
         # collision threshold
         collision_thresh = 5
@@ -138,8 +140,11 @@ class game_ball():
         if self.rect.top < 0:
             self.speed_y *= -1
         if self.rect.bottom > screen_height:
-            self.game_over = -1
-
+            lives -= 1
+            if lives == 0:
+                self.game_over = -1
+            else:
+                self.game_over = 2
         # look for collission with paddle
         if self.rect.colliderect(player_paddle):
             # check if colliding from the top
@@ -172,16 +177,17 @@ class game_ball():
         self.speed_x = 4
         self.speed_y = -4
         self.speed_max = 5
-        self.game_over = 0
-
+        self.game_over = None
 
 
 def main_game():
     run = True
+    global live_ball
+    global lives
+    global game_over
+    global score
+
     while run:
-        global live_ball
-        global game_over
-        global score
         clock.tick(fps)
 
         screen.fill(bg)
@@ -192,26 +198,33 @@ def main_game():
         wall.draw_wall()
         player_paddle.draw(screen)
         ball.draw()
-        
-        
 
-        # Music 
+
+
+        # Music
         main_theme_music.play()
         main_theme_music.set_volume(0.1)
 
 
         draw_text_with_outline(f'Score: {score}', font, score_text_color, screen_width -140, 10, outline_color)
+        draw_text_with_outline(f'Lives: {lives}', font, score_text_color, 10, 10, outline_color)
+
+        # Move the paddle regardless of the ball's state
+        player_paddle.move()
 
         if live_ball:
-            # draw paddle
-            player_paddle.move()
-            # draw ball
+            # if the ball is live, allow it to move
             game_over = ball.move()
-            if game_over != 0:
+
+            if game_over is not None:
                 live_ball = False
 
-        # print player instructions
-        if not live_ball:
+        else:
+            # if the ball is not live, keep it centered on the paddle
+            ball.rect.x = player_paddle.x + (player_paddle.width // 2) - ball.ball_rad
+            ball.rect.y = player_paddle.y - ball.ball_rad * 2
+
+            # display instructions
             if game_over == 0:
                 draw_text('PRESS ANY KEY TO START', font, score_text_color, 310, screen_height // 2 + 100)
             elif game_over == 1:
@@ -223,15 +236,15 @@ def main_game():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-            if event.type == pygame.KEYDOWN and live_ball == False:
-                score = 0
+            if event.type == pygame.KEYDOWN and not live_ball:
+                if lives == 0:  # Only reset score and lives if the game was over
+                    score = 0
+                    lives = 3
+                    wall.create_wall()
+                ball.reset(player_paddle.x + (player_paddle.width // 2), player_paddle.y - player_paddle.height + 10)
                 live_ball = True
-                ball.reset(player_paddle.x + (player_paddle.width // 2), player_paddle.y - player_paddle.height)
-                player_paddle.reset()
-                wall.create_wall()
-       
 
-        
+
 
         pygame.display.update()
 
@@ -246,11 +259,11 @@ def show_intro():
     intro_sound.play()
     pygame.time.delay(3000)  # Display intro for 3 seconds
 
-# The main game loop has been added into a function. This is to make it easier to add sections like menus and levels and intros.    
+
+# The main game loop has been added into a function. This is to make it easier to add sections like menus and levels and intros.
 player_paddle = paddle()
 ball = game_ball(player_paddle.x + (player_paddle.width // 2), player_paddle.y - player_paddle.height)
 wall = wall()
 wall.create_wall()
 show_intro()
 main_game()
-

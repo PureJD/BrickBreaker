@@ -49,6 +49,9 @@ class paddle:
     def move(self):
         """Move the paddle based on user input."""
         self.direction = 0
+        self.x = self.rect.x
+        self.y = self.rect.y
+
         key = pygame.key.get_pressed()
         if key[pygame.K_LEFT] and self.rect.left > 0:
             self.rect.x -= self.speed
