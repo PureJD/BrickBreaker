@@ -180,7 +180,7 @@ def main_game():
     while run:
         global live_ball
         global game_over
-        
+        global score
         clock.tick(fps)
 
         screen.fill(bg)
@@ -216,6 +216,7 @@ def main_game():
             if event.type == pygame.QUIT:
                 run = False
             if event.type == pygame.MOUSEBUTTONDOWN and live_ball == False:
+                score = 0
                 live_ball = True
                 ball.reset(player_paddle.x + (player_paddle.width // 2), player_paddle.y - player_paddle.height)
                 player_paddle.reset()
