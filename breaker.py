@@ -229,10 +229,10 @@ def main_game():
                 draw_text('PRESS SPACE BAR TO START', font, score_text_color, 310, screen_height // 2 + 100)
             elif game_over == 1:
                 draw_text('YOU WON!', font, score_text_color, 280, screen_height // 2 + 50)
-                draw_text('CLICK ANYWHERE TO START', font, score_text_color, 280, screen_height // 2 + 100)
+                draw_text('PRESS SPACE BAR TO START', font, score_text_color, 280, screen_height // 2 + 100)
             elif game_over == -1:
                 draw_text('YOU LOST!', font, score_text_color, 280, screen_height // 2 + 50)
-                draw_text('CLICK ANYWHERE TO START', font, score_text_color, 280, screen_height // 2 + 100)
+                draw_text('PRESS SPACE BAR TO START', font, score_text_color, 280, screen_height // 2 + 100)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
