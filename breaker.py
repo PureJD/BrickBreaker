@@ -3,6 +3,8 @@ from variables import *
 from pygame.locals import *
 from paddle import *
 from ball import game_ball
+from levels.level1 import level1
+from levels.level2 import level2
 
 # Music and sound effects engine and files
 pygame.init()
@@ -10,6 +12,9 @@ pygame.mixer.init()
 pygame.display.set_caption('Breakout')
 intro_sound = pygame.mixer.Sound('sounds/intro_sound.wav')
 main_theme_music = pygame.mixer.Sound('sounds/intro.wav')
+
+level_wall = level1()
+
 
 
 # function for outputting text onto the screen
@@ -32,69 +37,22 @@ def draw_text_with_outline(text, font, text_col, x, y, outline_col):
     screen.blit(text_surface, (x, y))
 
 
-# brick wall class
-class wall():
-    def __init__(self):
-        self.width = screen_width // cols
-        self.height = 30
-
-    def create_wall(self):
-        self.blocks = []
-        # define an empty list for an individual block
-        block_individual = []
-        for row in range(rows):
-            # reset the block row list
-            block_row = []
-            # iterate through each column in that row
-            for col in range(cols):
-                # generate x and y positions for each block and create a rectangle from that
-                block_x = col * self.width
-                block_y = row * self.height
-                rect = pygame.Rect(block_x, block_y, self.width, self.height)
-                # assign block strength based on row
-                if row < 2:
-                    strength = 3
-                elif row < 4:
-                    strength = 2
-                elif row < 6:
-                    strength = 1
-                # create a list at this point to store the rect and colour data
-                block_individual = [rect, strength]
-                # append that individual block to the block row
-                block_row.append(block_individual)
-            # append the row to the full list of blocks
-            self.blocks.append(block_row)
-
-    def draw_wall(self):
-        for row in self.blocks:
-            for block in row:
-                # assign a colour based on block strength
-                if block[1] == 3:
-                    block_col = block_blue
-                elif block[1] == 2:
-                    block_col = block_green
-                elif block[1] == 1:
-                    block_col = block_red
-                pygame.draw.rect(screen, block_col, block[0])
-                pygame.draw.rect(screen, bg, (block[0]), 2)
-
-
 def main_game():
     run = True
     global live_ball
     global lives
     global game_over
     global score
+    global level_wall
+
 
     while run:
         clock.tick(fps)
 
         screen.fill(bg)
 
-        # Display score
-
         # draw all objects
-        wall.draw_wall()
+        level_wall.draw_wall()
         player_paddle.draw(screen)
         ball.draw()
 
@@ -140,7 +98,10 @@ def main_game():
                     if lives == 0:  # Only reset score and lives if the game was over
                         score = 0
                         lives = 3
-                        wall.create_wall()
+                        ## This is where the level is changed
+                        level_wall = level2()
+                        ## This is where we draw the new level
+                        level_wall.create_wall()
                     ball.reset(player_paddle.x + (player_paddle.width // 2), player_paddle.y - player_paddle.height)
                     live_ball = True
 
@@ -182,7 +143,7 @@ def collide_wall():
     row_count = 0
     ball_rect_coords_x = ball.rect.centerx
 
-    for row in wall.blocks:
+    for row in level_wall.blocks:
         item_count = 0
         for item in row:
             # check collision
@@ -195,13 +156,13 @@ def collide_wall():
                 else:
                     ball.collide_y()
                 # reduce the block's strength by doing damage to it
-                if wall.blocks[row_count][item_count][1] > 1:
-                    wall.blocks[row_count][item_count][1] -= 1
+                if level_wall.blocks[row_count][item_count][1] > 1:
+                    level_wall.blocks[row_count][item_count][1] -= 1
                 else:
-                    wall.blocks[row_count][item_count][0] = (0, 0, 0, 0)
+                    level_wall.blocks[row_count][item_count][0] = (0, 0, 0, 0)
 
             # check if block still exists, in whcih case the wall is not destroyed
-            if wall.blocks[row_count][item_count][0] != (0, 0, 0, 0):
+            if level_wall.blocks[row_count][item_count][0] != (0, 0, 0, 0):
                 wall_destroyed = 0
             # increase item counter
             item_count += 1
@@ -224,7 +185,6 @@ def show_intro():
 # The main game loop has been added into a function. This is to make it easier to add sections like menus and levels and intros.
 player_paddle = paddle()
 ball = game_ball(player_paddle.x + (player_paddle.width // 2), player_paddle.y - player_paddle.height)
-wall = wall()
-wall.create_wall()
+level_wall.create_wall()
 show_intro()
 main_game()
