@@ -1,6 +1,7 @@
 from pygame import *
 from variables import *
 
+
 class level1():
     def __init__(self):
         self.width = screen_width // cols
@@ -9,35 +10,24 @@ class level1():
 
     def create_wall(self):
         self.blocks = []
-        # define an empty list for an individual block
-        block_individual = []
-        for row in range(rows):
-            # reset the block row list
+        # pattern for rows, e.g., [3, 5, 7, 5, 3] for a diamond shape
+        pattern = [1, 1, 1, 1, 3, 5, 7, 5, 3]
+        for row in range(len(pattern)):
             block_row = []
-            # iterate through each column in that row
-            for col in range(cols):
-                # generate x and y positions for each block and create a rectangle from that
+            offset = (cols - pattern[row]) // 2  # calculate offset for centered blocks
+            for col in range(offset, offset + pattern[row]):
                 block_x = col * self.width
                 block_y = row * self.height
                 rect = pygame.Rect(block_x, block_y, self.width, self.height)
-                # assign block strength based on row
-                if row < 2:
-                    strength = 3
-                elif row < 4:
-                    strength = 2
-                elif row < 6:
-                    strength = 1
-                # create a list at this point to store the rect and colour data
+                # alternating block strength
+                strength = (row % 3) + 1
                 block_individual = [rect, strength]
-                # append that individual block to the block row
                 block_row.append(block_individual)
-            # append the row to the full list of blocks
             self.blocks.append(block_row)
 
     def draw_wall(self):
         for row in self.blocks:
             for block in row:
-                # assign a colour based on block strength
                 if block[1] == 3:
                     block_col = block_blue
                 elif block[1] == 2:
@@ -45,4 +35,4 @@ class level1():
                 elif block[1] == 1:
                     block_col = block_red
                 pygame.draw.rect(screen, block_col, block[0])
-                pygame.draw.rect(screen, bg, (block[0]), 2)
+                pygame.draw.rect(screen, bg, block[0], 2)

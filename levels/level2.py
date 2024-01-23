@@ -4,7 +4,7 @@ from variables import *
 class level2():
     def __init__(self):
         self.width = screen_width // cols
-        self.height = 10
+        self.height = 30
         self.blocks = []
 
     def create_wall(self):
