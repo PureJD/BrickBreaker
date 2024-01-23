@@ -3,16 +3,13 @@ from variables import *
 from pygame.locals import *
 from paddle import *
 
+
+# Music and sound effects engine and files
 pygame.init()
 pygame.mixer.init()
 pygame.display.set_caption('Breakout')
-
-# For loading sound files:
 intro_sound = pygame.mixer.Sound('sounds/intro_sound.wav')
 main_theme_music = pygame.mixer.Sound('sounds/intro.wav')
-
-score = 0
-lives = 3
 
 
 # function for outputting text onto the screen
@@ -37,7 +34,7 @@ def draw_text_with_outline(text, font, text_col, x, y, outline_col):
 class wall():
     def __init__(self):
         self.width = screen_width // cols
-        self.height = 50
+        self.height = 30
 
     def create_wall(self):
         self.blocks = []
@@ -90,7 +87,7 @@ class game_ball():
         global lives
 
         # collision threshold
-        collision_thresh = 5
+        collision_thresh = Coll_variable_speed
 
         # start off with the assumption that the wall has been destroyed completely
         wall_destroyed = 1
@@ -147,6 +144,7 @@ class game_ball():
                 self.game_over = 2
         # look for collission with paddle
         if self.rect.colliderect(player_paddle):
+
             # check if colliding from the top
             if abs(self.rect.bottom - player_paddle.rect.top) < collision_thresh and self.speed_y > 0:
                 self.speed_y *= -1
@@ -174,9 +172,9 @@ class game_ball():
         self.x = x - self.ball_rad
         self.y = y
         self.rect = Rect(self.x, self.y, self.ball_rad * 2, self.ball_rad * 2)
-        self.speed_x = 4
-        self.speed_y = -4
-        self.speed_max = 5
+        self.speed_x = variable_self_speed_x
+        self.speed_y = -variable_self_speed_y
+        self.speed_max = Coll_variable_speed
         self.game_over = None
 
 

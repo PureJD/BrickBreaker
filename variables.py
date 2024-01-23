@@ -29,9 +29,19 @@ score_text_color = (255, 255, 0)  # Bright yellow
 outline_color = (0, 0, 0)  # Black outline
 
 # define game variables
-cols = 6
-rows = 6
+cols = 10
+rows = 10
 clock = pygame.time.Clock()
-fps = 60
+fps = 120
 live_ball = False
 game_over = 0
+
+# Game ball speed variables (update all variables evenly to increase speed and retain collisons)
+Coll_variable_speed = 5
+variable_self_speed_x = 4
+variable_self_speed_y = -4
+
+score = 0
+lives = 3
+
+
