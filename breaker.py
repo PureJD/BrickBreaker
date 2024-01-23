@@ -2,7 +2,7 @@ import pygame
 from variables import *
 from pygame.locals import *
 from paddle import *
-
+from ball import game_ball
 
 # Music and sound effects engine and files
 pygame.init()
@@ -17,18 +17,20 @@ def draw_text(text, font, text_col, x, y):
     img = font.render(text, True, text_col)
     screen.blit(img, (x, y))
 
+
 def draw_text_with_outline(text, font, text_col, x, y, outline_col):
     text_surface = font.render(text, True, text_col)
     outline_surface = font.render(text, True, outline_col)
 
     # Draw the outline by offsetting the position slightly
-    screen.blit(outline_surface, (x-1, y-1))
-    screen.blit(outline_surface, (x+1, y-1))
-    screen.blit(outline_surface, (x-1, y+1))
-    screen.blit(outline_surface, (x+1, y+1))
+    screen.blit(outline_surface, (x - 1, y - 1))
+    screen.blit(outline_surface, (x + 1, y - 1))
+    screen.blit(outline_surface, (x - 1, y + 1))
+    screen.blit(outline_surface, (x + 1, y + 1))
 
     # Draw the main text
     screen.blit(text_surface, (x, y))
+
 
 # brick wall class
 class wall():
@@ -77,107 +79,6 @@ class wall():
                 pygame.draw.rect(screen, bg, (block[0]), 2)
 
 
-# ball class
-class game_ball():
-    def __init__(self, x, y):
-        self.game_over = None
-        self.reset(x, y)
-
-    def move(self):
-        global lives
-
-        # collision threshold
-        collision_thresh = Coll_variable_speed
-
-        # start off with the assumption that the wall has been destroyed completely
-        wall_destroyed = 1
-        row_count = 0
-        for row in wall.blocks:
-            item_count = 0
-            for item in row:
-                # check collision
-                if self.rect.colliderect(item[0]):
-                    # Score update
-                    global score
-                    score += 1
-                    # check if collision was from above
-                    if abs(self.rect.bottom - item[0].top) < collision_thresh and self.speed_y > 0:
-                        self.speed_y *= -1
-                    # check if collision was from below
-                    if abs(self.rect.top - item[0].bottom) < collision_thresh and self.speed_y < 0:
-                        self.speed_y *= -1
-                    # check if collision was from left
-                    if abs(self.rect.right - item[0].left) < collision_thresh and self.speed_x > 0:
-                        self.speed_x *= -1
-                    # check if collision was from right
-                    if abs(self.rect.left - item[0].right) < collision_thresh and self.speed_x < 0:
-                        self.speed_x *= -1
-                    # reduce the block's strength by doing damage to it
-                    if wall.blocks[row_count][item_count][1] > 1:
-                        wall.blocks[row_count][item_count][1] -= 1
-                    else:
-                        wall.blocks[row_count][item_count][0] = (0, 0, 0, 0)
-
-                # check if block still exists, in whcih case the wall is not destroyed
-                if wall.blocks[row_count][item_count][0] != (0, 0, 0, 0):
-                    wall_destroyed = 0
-                # increase item counter
-                item_count += 1
-            # increase row counter
-            row_count += 1
-        # after iterating through all the blocks, check if the wall is destroyed
-        if wall_destroyed == 1:
-            self.game_over = 1
-
-        # check for collision with walls
-        if self.rect.left < 0 or self.rect.right > screen_width:
-            self.speed_x *= -1
-
-        # check for collision with top and bottom of the screen
-        if self.rect.top < 0:
-            self.speed_y *= -1
-        if self.rect.bottom > screen_height:
-            lives -= 1
-            if lives == 0:
-                self.game_over = -1
-            else:
-                self.game_over = 2
-        # look for collission with paddle
-        if self.rect.colliderect(player_paddle):
-
-            # check if colliding from the top
-            if abs(self.rect.bottom - player_paddle.rect.top) < collision_thresh and self.speed_y > 0:
-                self.speed_y *= -1
-                self.speed_x += player_paddle.direction
-                if self.speed_x > self.speed_max:
-                    self.speed_x = self.speed_max
-                elif self.speed_x < 0 and self.speed_x < -self.speed_max:
-                    self.speed_x = -self.speed_max
-            else:
-                self.speed_x *= -1
-
-        self.rect.x += self.speed_x
-        self.rect.y += self.speed_y
-
-        return self.game_over
-
-    def draw(self):
-        pygame.draw.circle(screen, paddle_col, (self.rect.x + self.ball_rad, self.rect.y + self.ball_rad),
-                           self.ball_rad)
-        pygame.draw.circle(screen, paddle_outline, (self.rect.x + self.ball_rad, self.rect.y + self.ball_rad),
-                           self.ball_rad, 3)
-
-    def reset(self, x, y):
-        self.ball_rad = 10
-        self.x = x - self.ball_rad
-        self.y = y
-        self.rect = Rect(self.x, self.y, self.ball_rad * 2, self.ball_rad * 2)
-        self.speed_x = variable_self_speed_x
-        self.speed_y = -variable_self_speed_y
-        self.speed_max = Coll_variable_speed
-        self.game_over = None
-
-
 def main_game():
     run = True
     global live_ball
@@ -197,27 +98,27 @@ def main_game():
         player_paddle.draw(screen)
         ball.draw()
 
-
-
         # Music
         main_theme_music.play()
         main_theme_music.set_volume(0.1)
 
-
-        draw_text_with_outline(f'Score: {score}', font, score_text_color, screen_width -140, 10, outline_color)
+        draw_text_with_outline(f'Score: {score}', font, score_text_color, screen_width - 140, 10, outline_color)
         draw_text_with_outline(f'Lives: {lives}', font, score_text_color, 10, 10, outline_color)
+
+        # Handle the ball's collisions
+        collide_wall()
+        collide_paddle()
+        collide_floor()
 
         # Move the paddle regardless of the ball's state
         player_paddle.move()
 
+        # Move the ball if it is live
         if live_ball:
-            # if the ball is live, allow it to move
-            game_over = ball.move()
+            ball.move()
 
-            if game_over is not None:
-                live_ball = False
+        if live_ball is False:
 
-        else:
             # if the ball is not live, keep it centered on the paddle
             ball.rect.x = player_paddle.x + (player_paddle.width // 2) - ball.ball_rad
             ball.rect.y = player_paddle.y - ball.ball_rad * 2
@@ -243,11 +144,72 @@ def main_game():
                     ball.reset(player_paddle.x + (player_paddle.width // 2), player_paddle.y - player_paddle.height)
                     live_ball = True
 
-
-
         pygame.display.update()
 
     pygame.quit()
+
+
+def collide_floor():
+    global lives, game_over, live_ball
+    if ball.rect.bottom > screen_height:
+        # stop the ball
+        live_ball = False
+        lives -= 1
+        if lives == 0:
+            game_over = -1
+        else:
+            game_over = 2
+
+
+def collide_paddle():
+    if ball.rect.colliderect(player_paddle):
+        # check if colliding from the top
+        if abs(ball.rect.bottom - player_paddle.rect.top) < 10 and ball.speed_y > 0:
+            ball.speed_y *= -1
+            ball.speed_x += player_paddle.direction
+            if ball.speed_x > ball.speed_max:
+                ball.speed_x = ball.speed_max
+            elif ball.speed_x < 0 and ball.speed_x < -ball.speed_max:
+                ball.speed_x = -ball.speed_max
+        else:
+            ball.speed_x *= -1
+
+
+def collide_wall():
+    global game_over, score
+    # start off with the assumption that the wall has been destroyed completely
+    wall_destroyed = 1
+    row_count = 0
+    ball_rect_coords_x = ball.rect.centerx
+
+    for row in wall.blocks:
+        item_count = 0
+        for item in row:
+            # check collision
+            if ball.rect.colliderect(item[0]):
+                # Score update
+                score += 1
+                block = item[0]
+                if ball_rect_coords_x < block.left or ball_rect_coords_x > block.right:
+                    ball.collide_x()
+                else:
+                    ball.collide_y()
+                # reduce the block's strength by doing damage to it
+                if wall.blocks[row_count][item_count][1] > 1:
+                    wall.blocks[row_count][item_count][1] -= 1
+                else:
+                    wall.blocks[row_count][item_count][0] = (0, 0, 0, 0)
+
+            # check if block still exists, in whcih case the wall is not destroyed
+            if wall.blocks[row_count][item_count][0] != (0, 0, 0, 0):
+                wall_destroyed = 0
+            # increase item counter
+            item_count += 1
+        # increase row counter
+        row_count += 1
+    # after iterating through all the blocks, check if the wall is destroyed
+    if wall_destroyed == 1:
+        game_over = 1
 
 
 def show_intro():

@@ -34,14 +34,13 @@ rows = 10
 clock = pygame.time.Clock()
 fps = 120
 live_ball = False
-game_over = 0
+game_over = None
 
 # Game ball speed variables (update all variables evenly to increase speed and retain collisons)
 Coll_variable_speed = 5
 variable_self_speed_x = 4
 variable_self_speed_y = -4
 
-score = 0
 lives = 3
-
+score = 0
 
