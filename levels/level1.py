@@ -10,19 +10,30 @@ class level1():
 
     def create_wall(self):
         self.blocks = []
-        # pattern for rows, e.g., [3, 5, 7, 5, 3] for a diamond shape
-        pattern = [1, 1, 1, 1, 3, 5, 7, 5, 3]
-        for row in range(len(pattern)):
+
+        pattern = [
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [2, 3, 3, 1, 0, 3, 1, 1, 3, 1],
+            [2, 0, 0, 0, 0, 0, 0, 0, 0, 3],
+            [2, 0, 0, 0, 0, 0, 0, 0, 2, 0],
+            [2, 1, 2, 2, 0, 0, 0, 1, 0, 0],
+            [3, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+            [3, 0, 0, 0, 0, 2, 0, 0, 0, 0],
+            [2, 2, 1, 3, 0, 3, 3, 3, 2, 1]
+        ]
+
+        for row_idx, row in enumerate(pattern):
             block_row = []
-            offset = (cols - pattern[row]) // 2  # calculate offset for centered blocks
-            for col in range(offset, offset + pattern[row]):
-                block_x = col * self.width
-                block_y = row * self.height
-                rect = pygame.Rect(block_x, block_y, self.width, self.height)
-                # alternating block strength
-                strength = (row % 3) + 1
-                block_individual = [rect, strength]
-                block_row.append(block_individual)
+            for col_idx, strength in enumerate(row):
+                if strength != 0:
+                    block_x = col_idx * self.width
+                    block_y = row_idx * self.height
+                    rect = pygame.Rect(block_x, block_y, self.width, self.height)
+                    block_individual = [rect, strength]
+                    block_row.append(block_individual)
             self.blocks.append(block_row)
 
     def draw_wall(self):
@@ -34,5 +45,9 @@ class level1():
                     block_col = block_green
                 elif block[1] == 1:
                     block_col = block_red
+                else:
+                    continue
+
                 pygame.draw.rect(screen, block_col, block[0])
-                pygame.draw.rect(screen, bg, block[0], 2)
+                # space between blocks
+                pygame.draw.rect(screen, bg, block[0], 1)

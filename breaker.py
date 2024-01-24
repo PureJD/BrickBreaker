@@ -59,7 +59,7 @@ def main_game():
         ball.draw()
 
         # Music
-        
+
         #main_theme_music.set_volume(0.1)
 
         draw_text_with_outline(f'Score: {score}', font, score_text_color, screen_width - 140, 10, outline_color)
@@ -121,7 +121,7 @@ def collide_floor():
             game_over = -1
         else:
             game_over = 2
-    
+
 
 
 def collide_paddle():
@@ -140,39 +140,35 @@ def collide_paddle():
 
 def collide_wall():
     global game_over, score
-    # start off with the assumption that the wall has been destroyed completely
-    wall_destroyed = 1
+    wall_destroyed = True
     row_count = 0
-    ball_rect_coords_x = ball.rect.centerx
 
     for row in level_wall.blocks:
         item_count = 0
         for item in row:
-            # check collision
-            if ball.rect.colliderect(item[0]):
-                # Score update
+            if item is not None and ball.rect.colliderect(item[0]):
                 score += 1
                 block = item[0]
+                ball_rect_coords_x = ball.rect.centerx
                 if ball_rect_coords_x < block.left or ball_rect_coords_x > block.right:
                     ball.collide_x()
                 else:
                     ball.collide_y()
-                # reduce the block's strength by doing damage to it
+
                 if level_wall.blocks[row_count][item_count][1] > 1:
                     level_wall.blocks[row_count][item_count][1] -= 1
                 else:
-                    level_wall.blocks[row_count][item_count][0] = (0, 0, 0, 0)
+                    level_wall.blocks[row_count].pop(item_count)
+                    item_count -= 1  # Adjust index since an item is removed
 
-            # check if block still exists, in whcih case the wall is not destroyed
-            if level_wall.blocks[row_count][item_count][0] != (0, 0, 0, 0):
-                wall_destroyed = 0
-            # increase item counter
+            if item is not None:
+                wall_destroyed = False
             item_count += 1
-        # increase row counter
         row_count += 1
-    # after iterating through all the blocks, check if the wall is destroyed
-    if wall_destroyed == 1:
+
+    if wall_destroyed:
         game_over = 1
+
 
 
 def show_intro():
