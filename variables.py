@@ -37,9 +37,9 @@ live_ball = False
 game_over = None
 
 # Game ball speed variables (update all variables evenly to increase speed and retain collisons)
-Coll_variable_speed = 5
-variable_self_speed_x = 4
-variable_self_speed_y = -4
+Coll_variable_speed = 4
+variable_self_speed_x = 5
+variable_self_speed_y = -5
 
 lives = 3
 score = 0

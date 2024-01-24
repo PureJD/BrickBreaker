@@ -8,11 +8,13 @@ from levels.level2 import level2
 
 # Music and sound effects engine and files
 pygame.init()
-pygame.mixer.init()
-pygame.display.set_caption('Breakout')
+pygame.mixer.init(44100, -16, 2, 2048)
+pygame.mixer.music.load('sounds/intro.wav')
 intro_sound = pygame.mixer.Sound('sounds/intro_sound.wav')
-main_theme_music = pygame.mixer.Sound('sounds/intro.wav')
+#main_theme_music = pygame.mixer.Sound('sounds/intro.wav')
+pop_sound = pygame.mixer.Sound('sounds/pop.wav')
 
+pygame.display.set_caption('Breakout')
 level_wall = level1()
 
 
@@ -57,8 +59,8 @@ def main_game():
         ball.draw()
 
         # Music
-        main_theme_music.play()
-        main_theme_music.set_volume(0.1)
+        
+        #main_theme_music.set_volume(0.1)
 
         draw_text_with_outline(f'Score: {score}', font, score_text_color, screen_width - 140, 10, outline_color)
         draw_text_with_outline(f'Lives: {lives}', font, score_text_color, 10, 10, outline_color)
@@ -74,7 +76,6 @@ def main_game():
         # Move the ball if it is live
         if live_ball:
             ball.move()
-
         if live_ball is False:
 
             # if the ball is not live, keep it centered on the paddle
@@ -120,6 +121,7 @@ def collide_floor():
             game_over = -1
         else:
             game_over = 2
+    
 
 
 def collide_paddle():
