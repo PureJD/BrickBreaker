@@ -15,9 +15,9 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 # define colours
 bg = (38, 38, 38)
 # block colours
-block_red = (178, 0, 0)
-block_green = (0, 178, 0)
-block_blue = (0, 11, 178)
+block_red = (10, 10, 10)
+block_green = (0, 255, 55)
+block_blue = (0, 211, 140)
 # paddle colours
 paddle_col = (80, 80, 80)
 paddle_outline = (100, 100, 100)
