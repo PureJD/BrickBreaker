@@ -33,7 +33,7 @@ class game_ball():
         self.speed_x = self.speed_x * -1
 
     def reset(self, x, y):
-        self.ball_rad = 10
+        self.ball_rad = 15
         self.x = x - self.ball_rad
         self.y = y
         self.rect = Rect(self.x, self.y, self.ball_rad * 2, self.ball_rad * 2)
