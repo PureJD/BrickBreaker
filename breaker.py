@@ -5,6 +5,7 @@ from paddle import *
 from ball import game_ball
 from levels.level1 import level1
 from levels.level2 import level2
+from levels.level3 import level3
 
 # Music and sound effects engine and files
 pygame.init()
@@ -15,7 +16,7 @@ intro_sound = pygame.mixer.Sound('sounds/intro_sound.wav')
 pop_sound = pygame.mixer.Sound('sounds/pop.wav')
 
 pygame.display.set_caption('Breakout')
-level_wall = level1()
+level_wall = level3()
 
 
 
@@ -100,7 +101,7 @@ def main_game():
                         score = 0
                         lives = 3
                         ## This is where the level is changed
-                        level_wall = level2()
+                        level_wall = level1()
                         ## This is where we draw the new level
                         level_wall.create_wall()
                     ball.reset(player_paddle.x + (player_paddle.width // 2), player_paddle.y - player_paddle.height)
@@ -172,12 +173,9 @@ def collide_wall():
 
 
 def show_intro():
-    intro_image = pygame.image.load("images/intro.jpg")
-    transformed_intro_image = pygame.transform.scale(intro_image, (1000, 1000))
-    screen.blit(transformed_intro_image, (0, 0))
     pygame.display.flip()
     intro_sound.play()
-    pygame.time.delay(3000)  # Display intro for 3 seconds
+    pygame.time.delay(2000)  # Display intro for 3 seconds
 
 
 # The main game loop has been added into a function. This is to make it easier to add sections like menus and levels and intros.

@@ -7,20 +7,23 @@ pygame.font.init()
 # define font
 font = pygame.font.SysFont('Constantia', 30)
 
-screen_width = 1000
-screen_height = 1000
+screen_width = 800
+screen_height = 800
 
 screen = pygame.display.set_mode((screen_width, screen_height))
 
 # define colours
 bg = (38, 38, 38)
+
 # block colours
 block_red = (10, 10, 10)
 block_green = (0, 255, 55)
 block_blue = (0, 211, 140)
+block_purple = (100, 255, 0)
+block_black = (0, 255, 100)
 # paddle colours
-paddle_col = (80, 80, 80)
-paddle_outline = (100, 100, 100)
+paddle_col = (125, 125, 125)
+paddle_outline = (0, 0, 0)
 # text colour
 text_col = (78, 81, 139)
 
