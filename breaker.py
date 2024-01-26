@@ -6,6 +6,7 @@ from ball import game_ball
 from levels.level1 import level1
 from levels.level2 import level2
 from levels.level3 import level3
+from levels.level_random import level_random
 
 # Music and sound effects engine and files
 pygame.init()
@@ -16,7 +17,7 @@ intro_sound = pygame.mixer.Sound('sounds/intro_sound.wav')
 pop_sound = pygame.mixer.Sound('sounds/pop.wav')
 
 pygame.display.set_caption('Breakout')
-level_wall = level3()
+level_wall = level_random()
 
 
 
