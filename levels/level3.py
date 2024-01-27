@@ -13,6 +13,19 @@ class level3():
         self.blocks = []
 
     def create_wall(self):
+
+        #Plays the track for the level
+        pygame.mixer.music.stop()
+        pygame.time.wait(2) 
+        pygame.mixer.init(44100, -16, 2, 2048)
+        pygame.mixer.music.load('sounds/intro.wav')
+        pygame.mixer.music.play(-1)
+        pygame.mixer.music.set_volume(0.1)
+
+
+
+
+
         self.blocks = []
 
         pattern = [

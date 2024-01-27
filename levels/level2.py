@@ -9,6 +9,17 @@ class level2():
 
     def create_wall(self):
         self.blocks = []
+
+        #Plays the track for the level
+        pygame.mixer.music.stop()
+        pygame.time.wait(2) 
+        pygame.mixer.init(44100, -16, 2, 2048)
+        pygame.mixer.music.load('sounds/intro.wav')
+        pygame.mixer.music.play(-1)
+        pygame.mixer.music.set_volume(0.1)
+
+
+
         # define an empty list for an individual block
         block_individual = []
         for row in range(rows):

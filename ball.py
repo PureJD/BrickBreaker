@@ -12,6 +12,7 @@ class game_ball():
         # check for collision with walls
         if self.rect.left < 0 or self.rect.right > screen_width:
             self.collide_x()
+            
 
         # check for collision with top and bottom of the screen
         if self.rect.top < 0:
