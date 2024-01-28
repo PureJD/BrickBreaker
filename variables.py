@@ -37,7 +37,10 @@ rows = 10
 clock = pygame.time.Clock()
 fps = 120
 live_ball = False
-game_over = None
+#
+game_state = 'start'  # 'start', 'playing', 'paused', 'game_over', 'game_won'
+current_level = 1
+max_levels = 4
 
 # Game ball speed variables (update all variables evenly to increase speed and retain collisons)
 Coll_variable_speed = 3
@@ -46,4 +49,3 @@ variable_self_speed_y = -4
 
 lives = 3
 score = 0
-

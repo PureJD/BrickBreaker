@@ -5,8 +5,8 @@ from variables import *
 class game_ball():
     def __init__(self, x, y):
         self.reset(x, y)
-        self.speed_y = -8
-        self.speed_x = 8
+        self.speed_y = variable_self_speed_x
+        self.speed_x = variable_self_speed_y
 
     def move(self):
         # check for collision with walls

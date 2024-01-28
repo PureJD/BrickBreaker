@@ -1,13 +1,12 @@
 import pygame
-from variables import *
 from pygame.locals import *
+from variables import *
 from paddle import *
 from ball import game_ball
 from levels.level1 import level1
 from levels.level2 import level2
 from levels.level3 import level3
 from levels.level_random import level_random
-
 
 pygame.init()
 
@@ -17,11 +16,8 @@ pygame.mixer.set_num_channels(2)
 intro_sound = pygame.mixer.Sound('sounds/intro_sound.wav')
 pop_sound = pygame.mixer.Sound('sounds/pop.wav')
 
-
-
 pygame.display.set_caption('Breakout')
-level_wall = level_random()
-
+level_wall = level1()
 
 
 # function for outputting text onto the screen
@@ -46,12 +42,13 @@ def draw_text_with_outline(text, font, text_col, x, y, outline_col):
 
 def main_game():
     run = True
-    global live_ball
+    # global live_ball
     global lives
-    global game_over
+    global game_state
     global score
     global level_wall
-
+    global current_level
+    global max_levels
 
     while run:
         clock.tick(fps)
@@ -73,61 +70,93 @@ def main_game():
 
         # Move the paddle regardless of the ball's state
         player_paddle.move()
-
         # Move the ball if it is live
-        if live_ball:
+        if game_state == 'playing':
             ball.move()
-        if live_ball is False:
-
+        else:
             # if the ball is not live, keep it centered on the paddle
             ball.rect.x = player_paddle.x + (player_paddle.width // 2) - ball.ball_rad
             ball.rect.y = player_paddle.y - ball.ball_rad * 2
 
             # display instructions
-            if game_over == 0:
-                draw_text('PRESS SPACE BAR TO START', font, score_text_color, 310, screen_height // 2 + 100)
-            elif game_over == 1:
-                draw_text('YOU WON!', font, score_text_color, 280, screen_height // 2 + 50)
+            if game_state == 'start':
+                draw_text('PRESS SPACE BAR TO START', font, score_text_color, screen_width // 4, screen_height // 2 + 100)
+            elif game_state == 'game_over':
+                draw_text('YOU LOST!', font, score_text_color, screen_width // 4, screen_height // 2 + 50)
                 draw_text('PRESS SPACE BAR TO START', font, score_text_color, 280, screen_height // 2 + 100)
-            elif game_over == -1:
-                draw_text('YOU LOST!', font, score_text_color, 280, screen_height // 2 + 50)
-                draw_text('PRESS SPACE BAR TO START', font, score_text_color, 280, screen_height // 2 + 100)
+            elif game_state == 'game_won':
+                if current_level == max_levels:
+                    draw_text('YOU WON!', font, score_text_color, screen_width // 4, screen_height // 2 + 50)
+                    draw_text('PRESS SPACE BAR TO RECEIVE YOUR AWARD', font, score_text_color, 280,
+                              screen_height // 2 + 100)
+                else:
+                    draw_text('LEVEL COMPLETE!', font, score_text_color, screen_width // 4, screen_height // 2 + 50)
+                    draw_text('PRESS SPACE BAR TO START NEXT LEVEL', font, score_text_color, 140,
+                              screen_height // 2 + 100)
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE and not live_ball:
-                    if lives == 0:  # Only reset score and lives if the game was over
-                        score = 0
-                        lives = 3
-                        ## This is where the level is changed
-                        level_wall = level1()
-                        ## This is where we draw the new level
-                        level_wall.create_wall()
-                    ball.reset(player_paddle.x + (player_paddle.width // 2), player_paddle.y - player_paddle.height)
-                    live_ball = True
-
+                if event.key == pygame.K_SPACE and game_state == 'start':
+                    game_state = 'playing'
+                elif event.key == pygame.K_SPACE and game_state == 'game_over':
+                    reset_game()
+                elif event.key == pygame.K_SPACE and game_state == 'game_won':
+                    level_complete()
         pygame.display.update()
-
     pygame.quit()
 
 
+
+def level_complete():
+    global game_state, current_level, max_levels
+    if current_level == max_levels:
+        game_state = 'game_won'
+    else:
+        current_level += 1
+        game_state = 'start'
+        if current_level == 2:
+            level_wall = level2()
+            level_wall.create_wall()
+        elif current_level == 3:
+            level_wall = level3()
+            level_wall.create_wall()
+        elif current_level == 4:
+            level_wall = level_random()
+            level_wall.create_wall()
+        else:
+            level_wall = level1()
+            level_wall.create_wall()
+
+
+def reset_game():
+    global lives, score, level_wall, game_state, current_level
+    ball.reset(player_paddle.x + (player_paddle.width // 2), player_paddle.y - player_paddle.height)
+    game_state = 'start'
+    level_wall = level1()
+    level_wall.create_wall()
+    lives = 3
+    score = 0
+    current_level = 1
+
+
 def collide_floor():
-    global lives, game_over, live_ball
+    global lives, game_state
     if ball.rect.bottom > screen_height:
         # stop the ball
-        live_ball = False
+        # live_ball = False
         lives -= 1
         if lives == 0:
-            game_over = -1
+            game_state = 'game_over'
         else:
-            game_over = 2
-
+            game_state = 'start'
+            ball.reset(player_paddle.x + (player_paddle.width // 2), player_paddle.y - player_paddle.height)
 
 
 def collide_paddle():
     if ball.rect.colliderect(player_paddle):
-        #Sound effect
+        # Sound effect
         pygame.mixer.Channel(1).play(pop_sound)
         # check if colliding from the top
         if abs(ball.rect.bottom - player_paddle.rect.top) < 10 and ball.speed_y > 0:
@@ -142,10 +171,9 @@ def collide_paddle():
 
 
 def collide_wall():
-    global game_over, score
+    global game_state, score
     wall_destroyed = True
     row_count = 0
-     
 
     for row in level_wall.blocks:
         item_count = 0
@@ -153,7 +181,7 @@ def collide_wall():
             if item is not None and ball.rect.colliderect(item[0]):
                 score += 1
 
-                #Plays sound effect upon collision 
+                # Plays sound effect upon collision
                 pygame.mixer.Channel(1).play(pop_sound)
 
                 block = item[0]
@@ -175,7 +203,7 @@ def collide_wall():
         row_count += 1
 
     if wall_destroyed:
-        game_over = 1
+        game_state = 'game_won'
 
 
 def show_intro():
@@ -191,4 +219,3 @@ ball = game_ball(player_paddle.x + (player_paddle.width // 2), player_paddle.y -
 show_intro()
 level_wall.create_wall()
 main_game()
- 
