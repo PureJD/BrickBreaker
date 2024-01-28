@@ -1,4 +1,4 @@
-![Python logo](https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/1869px-Python-logo-notext.svg.png)
+![Python logo](https://ih1.redbubble.net/image.4966926761.0666/fposter,small,wall_texture,square_product,600x600.jpg)
 
 
 # BrickBreaker Game - Collaborative Python Project
