@@ -26,18 +26,37 @@ def draw_text(text, font, text_col, x, y):
     screen.blit(img, (x, y))
 
 
-def draw_text_with_outline(text, font, text_col, x, y, outline_col):
+def draw_text_with_outline(text, font, text_col, x, y, outline_col, target_surface=None):
+    if target_surface is None:
+        target_surface = screen
     text_surface = font.render(text, True, text_col)
     outline_surface = font.render(text, True, outline_col)
 
     # Draw the outline by offsetting the position slightly
-    screen.blit(outline_surface, (x - 1, y - 1))
-    screen.blit(outline_surface, (x + 1, y - 1))
-    screen.blit(outline_surface, (x - 1, y + 1))
-    screen.blit(outline_surface, (x + 1, y + 1))
+    target_surface.blit(outline_surface, (x - 1, y - 1))
+    target_surface.blit(outline_surface, (x + 1, y - 1))
+    target_surface.blit(outline_surface, (x - 1, y + 1))
+    target_surface.blit(outline_surface, (x + 1, y + 1))
 
     # Draw the main text
-    screen.blit(text_surface, (x, y))
+    target_surface.blit(text_surface, (x, y))
+
+
+# Create a background surface
+background = pygame.Surface(screen.get_size())
+background = background.convert()
+background.fill(bg)  # bg is your background color
+
+
+# Create a surface for static UI elements
+ui_surface = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
+ui_surface = ui_surface.convert_alpha()
+
+# Draw static elements once
+draw_text_with_outline('Score:', font, score_text_color, screen_width - 180, 10, outline_color, ui_surface)
+draw_text_with_outline('Lives:', font, score_text_color, 10, 10, outline_color, ui_surface)
+
+
 
 
 def main_game():
@@ -53,15 +72,17 @@ def main_game():
     while run:
         clock.tick(fps)
 
-        screen.fill(bg)
+        screen.blit(background, (0, 0))
+        screen.blit(ui_surface, (0, 0))
+
+        # In your main game loop, for dynamic elements
+        draw_text_with_outline(f'{score}', font, score_text_color, screen_width - 95, 10, outline_color)
+        draw_text_with_outline(f'{lives}', font, score_text_color, 90, 10, outline_color)
 
         # draw all objects
         level_wall.draw_wall()
         player_paddle.draw(screen)
         ball.draw()
-
-        draw_text_with_outline(f'Score: {score}', font, score_text_color, screen_width - 140, 10, outline_color)
-        draw_text_with_outline(f'Lives: {lives}', font, score_text_color, 10, 10, outline_color)
 
         # Handle the ball's collisions
         collide_wall()
@@ -80,7 +101,8 @@ def main_game():
 
             # display instructions
             if game_state == 'start':
-                draw_text('PRESS SPACE BAR TO START', font, score_text_color, screen_width // 4, screen_height // 2 + 100)
+                draw_text('PRESS SPACE BAR TO START', font, score_text_color, screen_width // 4,
+                          screen_height // 2 + 100)
             elif game_state == 'game_over':
                 draw_text('YOU LOST!', font, score_text_color, screen_width // 4, screen_height // 2 + 50)
                 draw_text('PRESS SPACE BAR TO START', font, score_text_color, 280, screen_height // 2 + 100)
@@ -106,7 +128,6 @@ def main_game():
                     level_complete()
         pygame.display.update()
     pygame.quit()
-
 
 
 def level_complete():
@@ -159,15 +180,15 @@ def collide_paddle():
         # Sound effect
         pygame.mixer.Channel(1).play(pop_sound)
         # check if colliding from the top
-        if abs(ball.rect.bottom - player_paddle.rect.top) < 10 and ball.speed_y > 0:
-            ball.speed_y *= -1
-            ball.speed_x += player_paddle.direction
-            if ball.speed_x > ball.speed_max:
-                ball.speed_x = ball.speed_max
-            elif ball.speed_x < 0 and ball.speed_x < -ball.speed_max:
-                ball.speed_x = -ball.speed_max
+        if abs(ball.rect.bottom - player_paddle.rect.top) < 10 and ball.speed.y > 0:
+            ball.speed.y *= -1
+            ball.speed.x += player_paddle.direction
+            if ball.speed.x > ball.speed_max:
+                ball.speed.x = ball.speed_max
+            elif ball.speed.x < 0 and ball.speed.x < -ball.speed_max:
+                ball.speed.x = -ball.speed_max
         else:
-            ball.speed_x *= -1
+            ball.speed.x *= -1
 
 
 def collide_wall():
