@@ -6,6 +6,7 @@ from ball import game_ball
 from levels.level1 import level1
 from levels.level2 import level2
 from levels.level3 import level3
+from levels.level4 import level4
 from levels.level_random import level_random
 
 pygame.init()
@@ -17,7 +18,7 @@ intro_sound = pygame.mixer.Sound('sounds/intro_sound.wav')
 pop_sound = pygame.mixer.Sound('sounds/pop.wav')
 
 pygame.display.set_caption('Breakout')
-level_wall = level1()
+level_wall = level4()
 
 
 # function for outputting text onto the screen
@@ -144,6 +145,9 @@ def level_complete():
             level_wall = level3()
             level_wall.create_wall()
         elif current_level == 4:
+            level_wall = level4()
+            level_wall.create_wall()
+        elif current_level == 5:
             level_wall = level_random()
             level_wall.create_wall()
         else:
