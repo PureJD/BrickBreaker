@@ -21,6 +21,7 @@ pygame.display.set_caption('Breakout')
 level_wall = level1()
 
 
+
 # function for outputting text onto the screen
 def draw_text(text, font, text_col, x, y):
     img = font.render(text, True, text_col)
@@ -66,6 +67,10 @@ def main_game():
     global level_wall
     global current_level
     global max_levels
+    global power_up
+
+    
+
 
     while run:
         clock.tick(fps)
@@ -76,11 +81,16 @@ def main_game():
         # In your main game loop, for dynamic elements
         draw_text_with_outline(f'{score}', font, score_text_color, screen_width - 95, 10, outline_color)
         draw_text_with_outline(f'{lives}', font, score_text_color, 90, 10, outline_color)
+        draw_text_with_outline(f'{power_up}', font, score_text_color, screen_width /2, 10, outline_color)
 
         # draw all objects
         level_wall.draw_wall()
         player_paddle.draw(screen)
         ball.draw()
+
+
+        if power_up == 0:
+            game_ball(player_paddle.x + (player_paddle.width // 2), player_paddle.y - player_paddle.height, 50)
 
         # Move the paddle regardless of the ball's state
         player_paddle.move()
@@ -165,10 +175,14 @@ def reset_game():
 
 def collide_floor():
     global lives, game_state
+    global lives, power_up
     if ball.rect.bottom > screen_height:
         # stop the ball
         # live_ball = False
         lives -= 1
+
+        power_up = 5
+
         if lives == 0:
             game_state = 'game_over'
         else:
@@ -194,6 +208,7 @@ def collide_paddle():
 
 def collide_wall():
     global game_state, score
+    global game_state, power_up
     ball_next_pos = ball.rect.copy()
     ball_next_pos.move_ip(ball.speed)
 
@@ -210,6 +225,9 @@ def collide_wall():
                 if ball_next_pos.colliderect(brick_rect):
                     collision_detected = True
                     score += 1  # Adjust scoring as per your game's logic
+
+                    # Power up will +1 for every brick hit and then reset if a brick is missed. If you hit 5 in a row it will make ball better.
+                    power_up -= 1
 
                     # Play collision sound
                     pygame.mixer.Channel(1).play(pop_sound)
@@ -251,6 +269,7 @@ def show_intro():
 # The main game loop has been added into a function. This is to make it easier to add sections like menus and levels and intros.
 player_paddle = paddle()
 ball = game_ball(player_paddle.x + (player_paddle.width // 2), player_paddle.y - player_paddle.height)
+
 show_intro()
 level_wall.create_wall()
 main_game()

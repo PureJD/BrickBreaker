@@ -49,3 +49,5 @@ variable_self_speed_y = -4
 
 lives = 3
 score = 0
+power_up = 5
+

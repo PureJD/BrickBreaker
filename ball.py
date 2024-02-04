@@ -1,9 +1,10 @@
 from pygame import Rect, Vector2
 from variables import *
 
+
 class game_ball():
-    def __init__(self, x, y):
-        self.ball_rad = 10
+    def __init__(self, x, y, ball_size = 10):
+        self.ball_rad = ball_size
         self.speed_max = Coll_variable_speed
         self.rect = Rect(x - self.ball_rad, y, self.ball_rad * 2, self.ball_rad * 2)
         self.speed = Vector2(variable_self_speed_x, variable_self_speed_y)
