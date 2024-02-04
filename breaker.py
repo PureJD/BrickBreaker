@@ -18,7 +18,7 @@ intro_sound = pygame.mixer.Sound('sounds/intro_sound.wav')
 pop_sound = pygame.mixer.Sound('sounds/pop.wav')
 
 pygame.display.set_caption('Breakout')
-level_wall = level4()
+level_wall = level1()
 
 
 # function for outputting text onto the screen
@@ -48,7 +48,6 @@ background = pygame.Surface(screen.get_size())
 background = background.convert()
 background.fill(bg)  # bg is your background color
 
-
 # Create a surface for static UI elements
 ui_surface = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
 ui_surface = ui_surface.convert_alpha()
@@ -56,8 +55,6 @@ ui_surface = ui_surface.convert_alpha()
 # Draw static elements once
 draw_text_with_outline('Score:', font, score_text_color, screen_width - 180, 10, outline_color, ui_surface)
 draw_text_with_outline('Lives:', font, score_text_color, 10, 10, outline_color, ui_surface)
-
-
 
 
 def main_game():
@@ -85,16 +82,15 @@ def main_game():
         player_paddle.draw(screen)
         ball.draw()
 
-        # Handle the ball's collisions
-        collide_wall()
-        collide_paddle()
-        collide_floor()
-
         # Move the paddle regardless of the ball's state
         player_paddle.move()
         # Move the ball if it is live
         if game_state == 'playing':
+            # Handle the ball's collisions
             ball.move()
+            collide_wall()
+            collide_paddle()
+            collide_floor()
         else:
             # if the ball is not live, keep it centered on the paddle
             ball.rect.x = player_paddle.x + (player_paddle.width // 2) - ball.ball_rad
@@ -132,12 +128,11 @@ def main_game():
 
 
 def level_complete():
-    global game_state, current_level, max_levels
+    global game_state, current_level, max_levels, level_wall
     if current_level == max_levels:
         game_state = 'game_won'
     else:
         current_level += 1
-        game_state = 'start'
         if current_level == 2:
             level_wall = level2()
             level_wall.create_wall()
@@ -153,6 +148,8 @@ def level_complete():
         else:
             level_wall = level1()
             level_wall.create_wall()
+
+    game_state = 'start'
 
 
 def reset_game():
@@ -199,7 +196,6 @@ def collide_wall():
     global game_state, score
     wall_destroyed = True
     row_count = 0
-
     for row in level_wall.blocks:
         item_count = 0
         for item in row:
