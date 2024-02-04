@@ -1,8 +1,8 @@
 import pygame
-from pygame.locals import *
 from variables import *
-from paddle import *
+from paddle import paddle
 from ball import game_ball
+
 from levels.level1 import level1
 from levels.level2 import level2
 from levels.level3 import level3
