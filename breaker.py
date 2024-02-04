@@ -194,37 +194,51 @@ def collide_paddle():
 
 def collide_wall():
     global game_state, score
-    wall_destroyed = True
+    ball_next_pos = ball.rect.copy()
+    ball_next_pos.move_ip(ball.speed)
+
+    collision_detected = False
+    all_bricks_destroyed = True  # Assume all bricks are destroyed until proven otherwise
     row_count = 0
     for row in level_wall.blocks:
         item_count = 0
         for item in row:
-            if item is not None and ball.rect.colliderect(item[0]):
-                score += 1
-
-                # Plays sound effect upon collision
-                pygame.mixer.Channel(1).play(pop_sound)
-
-                block = item[0]
-                ball_rect_coords_x = ball.rect.centerx
-                if ball_rect_coords_x < block.left or ball_rect_coords_x > block.right:
-                    ball.collide_x()
-                else:
-                    ball.collide_y()
-
-                if level_wall.blocks[row_count][item_count][1] > 1:
-                    level_wall.blocks[row_count][item_count][1] -= 1
-                else:
-                    level_wall.blocks[row_count].pop(item_count)
-                    item_count -= 1  # Adjust index since an item is removed
-
             if item is not None:
-                wall_destroyed = False
+                all_bricks_destroyed = False  # Found an intact brick
+                brick_rect = item[0]
+                # Check if the ball's next position collides with any brick
+                if ball_next_pos.colliderect(brick_rect):
+                    collision_detected = True
+                    score += 1  # Adjust scoring as per your game's logic
+
+                    # Play collision sound
+                    pygame.mixer.Channel(1).play(pop_sound)
+
+                    # Determine the side of the collision
+                    if ball.rect.centery < brick_rect.top or ball.rect.centery > brick_rect.bottom:
+                        ball.collide_y()
+                    else:
+                        ball.collide_x()
+
+                    # Handle the brick's removal or damage here
+                    if item[1] > 1:  # If the brick has more than 1 durability
+                        level_wall.blocks[row_count][item_count][1] -= 1
+                    else:
+                        level_wall.blocks[row_count].pop(item_count)
+                        item_count -= 1  # Adjust because we've removed an item
+
+                    # Optionally, break here if you only want to handle the first collision detected
+                    # break
+
             item_count += 1
         row_count += 1
+        if collision_detected:
+            break
 
-    if wall_destroyed:
-        game_state = 'game_won'
+    if all_bricks_destroyed:
+        # All bricks are destroyed, advance game state
+        game_state = 'game_won'  # Or any other logic to advance the level or win the game
+
 
 
 def show_intro():
