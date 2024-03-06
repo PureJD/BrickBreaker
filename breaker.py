@@ -2,6 +2,7 @@ import pygame
 from variables import *
 from paddle import paddle
 from ball import game_ball
+import random 
 
 from levels.level1 import level1
 from levels.level2 import level2
@@ -20,7 +21,32 @@ pop_sound = pygame.mixer.Sound('sounds/pop.wav')
 pygame.display.set_caption('Breakout')
 level_wall = level1()
 
+def generate_stars(num_stars):
+    stars = []
+    for _ in range(num_stars):
+        x = random.randint(0, screen_width)
+        y = random.randint(0, screen_height)
+        size = random.randint(1, 2)
+        stars.append((x, y, size))
+    return stars
+stars = generate_stars(100)
 
+class Multiball:
+    def __init__(self):
+        self.balls = []
+
+    def spawn_balls(self, num_balls, paddle_x, paddle_y):
+        self.balls = [game_ball(paddle_x, paddle_y, 50) for _ in range(num_balls)]
+
+    def draw(self, screen):
+        for ball in self.balls:
+            ball.draw()
+
+    def move(self):
+        for ball in self.balls:
+            ball.move()
+
+multiball = Multiball()
 
 # function for outputting text onto the screen
 def draw_text(text, font, text_col, x, y):
@@ -78,19 +104,25 @@ def main_game():
         screen.blit(background, (0, 0))
         screen.blit(ui_surface, (0, 0))
 
+        for star in stars:
+            pygame.draw.circle(screen, (255, 255, 0), (star[0], star[1]), star[2])
+
+
+        pygame.draw.rect(screen, (255, 165, 0), (0, screen_height - 10, screen_width, 20))
+
         # In your main game loop, for dynamic elements
         draw_text_with_outline(f'{score}', font, score_text_color, screen_width - 95, 10, outline_color)
         draw_text_with_outline(f'{lives}', font, score_text_color, 90, 10, outline_color)
-        draw_text_with_outline(f'{power_up}', font, score_text_color, screen_width /2, 10, outline_color)
+        
 
         # draw all objects
         level_wall.draw_wall()
         player_paddle.draw(screen)
         ball.draw()
 
-
-        if power_up == 0:
-            game_ball(player_paddle.x + (player_paddle.width // 2), player_paddle.y - player_paddle.height, 50)
+       
+        
+        
 
         # Move the paddle regardless of the ball's state
         player_paddle.move()
