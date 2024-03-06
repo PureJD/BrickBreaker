@@ -1,6 +1,3 @@
-![Python logo](https://e7.pngegg.com/pngimages/997/63/png-clipart-programming-python-logo-programming-language-computer-programming-programming-python-logo-thumbnail.png)
-
-
 # BrickBreaker Game - Collaborative Python Project
 
 #### Welcome to our collaborative project - A BrickBreaker game implemented in Python! This project showcases our collective skills in software development, teamwork, and problem-solving. BrickBreaker is a classic arcade-style game where players control a paddle to bounce a ball and break bricks. This README provides essential information about the project, its features, and how to run the game.
